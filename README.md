@@ -8,5 +8,10 @@ This is the C++ implementation of our IROS 2019 paper:
 An overview of the proposed loop closure detection method:
 ![Flowchart](./images/flowchart.jpg)
 
-The results in the paper:
-![Result](./images/result.jpg)
+##License
+The project is licensed under the New BSD license. It makes use of several third-party libraries:
+hnswlib: https://github.com/nmslib/hnswlib
+Theia Vision Library: http://theia-sfm.org/
+
+If you find this work useful in your research, please cite:
+**Shan An**, Guangfu Che, Fangru Zhou, Xianglong Liu, Xin Ma, Yu Chen. Submitted to The 2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS 2019) 
