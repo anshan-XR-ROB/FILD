@@ -1,0 +1,198 @@
+#include "lcdengine.hpp"
+#include "hnswlib.hpp"
+#include "extractor.hpp"
+#include "geometrical_verification.hpp"
+#include "theialib.hpp"
+
+LCDEngine::LCDEngine()
+{
+
+    OnInit();
+}
+void LCDEngine::OnInit()
+{
+    // - read frame names
+    const std::string& root_dir = Utils::GetParamsOf<std::string>("root_dir"); 
+    const std::string& image_dir = Utils::GetParamsOf<std::string>("image_dir"); 
+    const std::string& namelist_file = Utils::GetParamsOf<std::string>("image_name_list");
+    frame_abspath_vec_ = std::move(ReadFrameAbsPaths(root_dir + namelist_file, root_dir + image_dir)); 
+    std::cout << " - read frame names done." << std::endl;
+
+    // - initial hnsw engine
+    hnsw_engine_.reset(new Index("cosine", Utils::GetParamsOf<int>("cnn_feat_dim")));
+    hnsw_engine_->CreateNewIndex(frame_abspath_vec_.size(), 16, 200);
+    std::cout << " - initial hnsw engine done." << std::endl;
+
+    // - initial cnn extratcor
+    const std::string deploy = root_dir + "/resource/model_res152/deploy_resnet152_places365.prototxt";
+    const std::string weight = root_dir + "/resource/model_res152/resnet152_places365.caffemodel";
+    const int cnn_gpu_id = 1;
+    extractor_.reset(new Extractor(deploy, weight, cnn_gpu_id));
+    std::cout << " - initial cnn extractor done." << std::endl;
+ 
+    // - initial geom verif
+    const int surf_gpu_id = 1;
+    const bool extended = true;
+    geom_verif_.reset(new GeometricalVerification(surf_gpu_id, extended));
+    std::cout << " - initial geom verif done." << std::endl;
+}
+
+std::vector<std::string> 
+LCDEngine::ReadFrameAbsPaths(const std::string& namelist_file, const std::string& image_dir)
+{
+    std::vector<std::string> abs_paths;
+    std::ifstream ifs(namelist_file);	
+
+	if(ifs.is_open() == false)
+	{
+		std::cerr << " - ReadFrameAbsPaths cannot open " << namelist_file << std::endl;
+		return abs_paths;
+	}
+
+	char buffer[1000];
+	while (!ifs.eof())
+	{
+		ifs.getline(buffer, 1000);
+		std::string line(buffer);
+		if (line.empty()) continue;
+        line = Utils::Trim(line);
+        abs_paths.emplace_back(image_dir + "/" + line);
+	}
+
+	ifs.close();
+
+    return abs_paths;
+
+}
+
+void LCDEngine::Run()
+{
+    const int search_avoid_frames = Utils::GetParamsOf<int>("frame_rate") *
+            Utils::GetParamsOf<int>("avoid_search_time");
+    const int top_n = Utils::GetParamsOf<int>("top_n");
+    const float threshold = Utils::GetParamsOf<float>("similarity_threshold");          
+    const int dim = 128;
+    
+    std::ofstream ofs("lcd_result.txt"); 
+    std::list<std::pair<int, std::vector<float> > > inds_buf;
+    std::vector<std::shared_ptr<HashedImage> > hash_vec;
+    std::vector<std::vector<cv::KeyPoint> > keypoint_vec;
+    std::vector<std::vector<float> > descriptor_vec;
+    TheiaTool theia(dim);    
+    // load each frame
+    for(size_t i = 0; i != frame_abspath_vec_.size(); ++i)
+    {
+        std::cout << "start loop " << i << std::endl;
+        const std::string& path = frame_abspath_vec_[i]; 
+        cv::Mat frame = cv::imread(path, 1); 
+        //std::cout << "frame " << i << ", " << path << std::endl;
+        // do cnn feature embedding
+        //std::cout << "do cnn feature embedding" << std::endl;
+        std::vector<float> feat = std::move(extractor_->DoInference(frame));
+        //for(int j = 0; j < feat.size(); j++)
+        //    cout << " " << feat[j] << " ";
+        //exit(-1);  
+        // convert to cascadehash 
+        //std::cout << "convert to cascadehash" << std::endl;
+        std::pair<std::vector<float>, std::vector<cv::KeyPoint> > surf = geom_verif_->GetSurfDescriptorsAndKeyPoints(frame);   
+        std::vector<cv::KeyPoint> keypoint = surf.second;
+        keypoint_vec.push_back(keypoint);
+        std::vector<float> descriptor = surf.first;
+        descriptor_vec.push_back(descriptor);
+        //std::shared_ptr<HashedImage> hash = theia.CreateHashedDescriptors(surf.first);               
+        //hash_vec.push_back(hash); 
+        //std::cout << "hash ok " << "in frame " << i << std::endl;
+        if(i > search_avoid_frames)
+        {
+            auto guard_data = std::move(inds_buf.front());
+            inds_buf.pop_front();
+
+            int guard_ind                 = std::get<0>(guard_data);
+            std::vector<float> guard_feat = std::get<1>(guard_data);
+            // insert into hnsw_engine
+            //std::cout << "insert into hnsw_engine" << std::endl;
+            hnsw_engine_->AddItem((void *)guard_feat.data(), guard_ind);
+
+            // do query use hnsw_engine
+            //std::cout << "do query use hnsw_engine" << std::endl;
+            std::priority_queue<std::pair<float, hnswlib::labeltype> > result = 
+                    hnsw_engine_->SearchKnn((void *)feat.data(), top_n);
+
+            std::vector<std::pair<float, hnswlib::labeltype> > top_indexs;
+            while(result.size())
+            {
+                top_indexs.emplace_back(result.top());
+                result.pop();
+            }
+            // reverse indes 
+            std::reverse(top_indexs.begin(), top_indexs.end());
+            ofs << i + 1;
+            // do geom verif 
+            for(int j = 0; j < top_indexs.size(); j++)
+            {
+               //if( top_indexs[j].first < (1.0 - threshold))
+               {
+                   //cout << "Match top_indexs[j].second: " << top_indexs[j].second << endl;
+                   //cout << "hash_vec size: " << hash_vec.size() << endl;
+                   //std::vector<IndexedFeatureMatch> result = theia.Match(hash, hash_vec[top_indexs[j].second]); 
+                   BFMatcher matcher;
+                   vector< vector< DMatch> > matches;
+                   Mat descriptors_object = Mat(descriptor.size()/128, 128, CV_32FC1);
+                   Mat descriptors_scene = Mat(descriptor_vec[top_indexs[j].second].size()/128, 128, CV_32FC1);
+                   memcpy(descriptors_object.data, descriptor.data(), descriptor.size()*sizeof(float));
+                   memcpy(descriptors_scene.data, descriptor_vec[top_indexs[j].second].data(), descriptor_vec[top_indexs[j].second].size()*sizeof(float));
+                   matcher.knnMatch(descriptors_object, descriptors_scene, matches, 2 );
+                   std::vector< DMatch > good_matches;
+                   for (int k = 0; k < std::min(int(descriptor_vec[top_indexs[j].second].size()/128) - 1, (int)matches.size()); k++)
+                   {   
+                       if ( (matches[k][0].distance < 0.6*(matches[k][1].distance)) &&
+                               ((int)matches[k].size() <= 2 && (int)matches[k].size()>0) )
+                       {   
+                           // take the first result only if its distance is smaller than 0.6*second_best_dist
+                           // that means this descriptor is ignored if the second distance is bigger or of similar
+                           good_matches.push_back( matches[k][0] );
+                       }   
+                   }   
+                   int ransacPoints = 0;
+                   if(good_matches.size() > 4)// 15)
+                   {   
+                       std::vector<cv::Point2f> points1;
+                       std::vector<cv::Point2f> points2;
+                       for(int n = 0; n < good_matches.size(); n++)
+                       {   
+                           points1.push_back(keypoint_vec[i].at(good_matches[n].queryIdx).pt);
+                           points2.push_back(keypoint_vec[top_indexs[j].second].at(good_matches[n].trainIdx).pt);
+                       }   
+                       std::vector<uchar> inliers(points1.size(),0);
+                       cv::Mat fundamental= cv::findFundamentalMat(cv::Mat(points1),cv::Mat(points2),inliers,CV_FM_RANSAC);
+                       for(int n = 0; n < inliers.size(); n++)
+                       {   
+                           if((unsigned int)inliers[n])
+                           {   
+                               ransacPoints++;
+                           }   
+                       }   
+                   } 
+                   cout << "Process: " << i << " with surf matches:" << result.size() << "and inliers: " << ransacPoints << std::endl; 
+                   //if(ransacPoints >= 7)
+                   {
+                      ofs << " " << top_indexs[j].second + 1 << " " << 1.0 - top_indexs[j].first << " " << good_matches.size() << " " << ransacPoints;
+                      //ofs << " " << frame_abspath_vec_[i] << " " << frame_abspath_vec_[top_indexs[j].second];
+                      //break;
+                   }
+               }
+               // ofs << " " << top_indexs[j].second + 1 << " " << 1.0 - top_indexs[j].first;
+            }
+            ofs << std::endl;
+        }
+        inds_buf.emplace_back(i, feat);
+        //std::cout << "inds_buf.emplace_back " << "in frame " << i << std::endl;
+    }
+    ofs.close();
+}
+
+void LCDEngine::OnDestroy()
+{
+
+}
+
