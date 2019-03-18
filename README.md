@@ -15,5 +15,6 @@ hnswlib: https://github.com/nmslib/hnswlib
 
 Theia Vision Library: http://theia-sfm.org/
 
+## Related Publications
 If you find this work useful in your research, please cite:
 **Shan An**, Guangfu Che, Fangru Zhou, Xianglong Liu, Xin Ma, Yu Chen. Submitted to The 2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS 2019) 
