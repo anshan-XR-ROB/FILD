@@ -10,6 +10,7 @@ An overview of the proposed loop closure detection method:
 
 ##License
 The project is licensed under the New BSD license. It makes use of several third-party libraries:
+
 hnswlib: https://github.com/nmslib/hnswlib
 
 Theia Vision Library: http://theia-sfm.org/
