@@ -8,7 +8,7 @@ This is the C++ implementation of our IROS 2019 paper:
 An overview of the proposed loop closure detection method:
 ![Flowchart](./images/flowchart.jpg)
 
-##License
+## License
 The project is licensed under the New BSD license. It makes use of several third-party libraries:
 
 hnswlib: https://github.com/nmslib/hnswlib
