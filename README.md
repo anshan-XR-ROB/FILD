@@ -7,3 +7,6 @@ This is the C++ implementation of our IROS 2019 paper:
 
 An overview of the proposed loop closure detection method:
 ![Flowchart](./images/flowchart.jpg)
+
+The results in the paper:
+![Result](./images/result.jpg)
