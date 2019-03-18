@@ -9,4 +9,4 @@ An overview of the proposed loop closure detection method:
 ![Flowchart](./images/flowchart.jpg)
 
 The results in the paper:
-![Result](./images/result.jpg)
+[Result](./images/result.jpg)
