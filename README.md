@@ -18,6 +18,7 @@ Theia Vision Library: http://theia-sfm.org/
 ## Related Publications
 If you find this work useful in your research, please cite:
 **Shan An**, Guangfu Che, Fangru Zhou, Xianglong Liu, Xin Ma, Yu Chen. Fast and Incremental Loop closure Detection using Proximity Graphs. The 2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS 2019) 
+```
 @inproceedings{anshan2019fild,
   title={Fast and Incremental Loop closure Detection using Proximity Graphs},
     author={Shan An, Guangfu Che, Fangru Zhou, Xianglong Liu, Xin Ma, Yu Chen},
@@ -26,3 +27,4 @@ If you find this work useful in your research, please cite:
 	          year={2019},
     	      	month={Nov.}
     	      	}
+```
