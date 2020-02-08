@@ -25,6 +25,5 @@ If you find this work useful in your research, please cite:
   booktitle={Proc. IEEE/RSJ Int. Conf. Intell. Robots Syst.},
   pages={378--385},
   year={2019},
-  month={Nov.}
-    	      	}
+  month={Nov.}}
 ```
