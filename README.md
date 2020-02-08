@@ -21,10 +21,10 @@ If you find this work useful in your research, please cite:
 ```
 @inproceedings{anshan2019fild,
   title={Fast and Incremental Loop closure Detection using Proximity Graphs},
-    author={Shan An, Guangfu Che, Fangru Zhou, Xianglong Liu, Xin Ma, Yu Chen},
-    	booktitle={Proc. IEEE/RSJ Int. Conf. Intell. Robots Syst.},
-        	pages={378--385},
-	          year={2019},
-    	      	month={Nov.}
+  author={Shan An, Guangfu Che, Fangru Zhou, Xianglong Liu, Xin Ma, Yu Chen},
+  booktitle={Proc. IEEE/RSJ Int. Conf. Intell. Robots Syst.},
+  pages={378--385},
+  year={2019},
+  month={Nov.}
     	      	}
 ```
