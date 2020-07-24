@@ -13,7 +13,7 @@ The project is licensed under the New BSD license. It makes use of several third
 
 hnswlib: https://github.com/nmslib/hnswlib
 
-Theia Vision Library: http://theia-sfm.org/
+The original hnswlib is head-only. We modify it to a stand-alone dynamic library. 
 
 ## Related Publications
 If you find this work useful in your research, please cite:
