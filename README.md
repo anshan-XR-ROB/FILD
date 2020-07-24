@@ -12,6 +12,9 @@ Given the query sensor measurement, similar locations from the trajectory are re
 Exhaustive experiments on several publicly-available datasets exhibit the system's high performance and low execution time compared to other contemporary state-of-the-art pipelines.
 
 
+*** 
+*** 
+
 # Fast and Incremental Loop closure Detection using Proximity Graphs
 
 This is the C++ implementation of our IROS 2019 paper:
