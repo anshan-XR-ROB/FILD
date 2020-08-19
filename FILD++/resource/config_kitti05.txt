@@ -1,0 +1,10 @@
+root_dir			:   /export/sdb/anshan/TRO_LCD/loop-closure-detection/	
+image_dir			:	resource/kitti05/
+image_name_list		:   resource/kitti05_image_list.txt
+frame_rate			: 	10	
+avoid_search_time	:	40
+cnn_feat_dim        :	1024
+top_n				:	5
+hnsw_m              :   48
+hnsw_ef             :   20
+similarity_threshold:   0.1

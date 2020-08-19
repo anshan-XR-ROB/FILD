@@ -1,0 +1,1 @@
+/export/sdb/anshan/TRO_LCD/theialib_v2/libraries/statx/build/./install/lib/libstatx.a

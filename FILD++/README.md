@@ -11,3 +11,17 @@ Subsequently, a modified hierarchical-navigable small-world graph incrementally 
 Given the query sensor measurement, similar locations from the trajectory are retrieved using these representations, while an image-to-image pairing is further evaluated thanks to the spatial information provided by the local features.
 Exhaustive experiments on several publicly-available datasets exhibit the system's high performance and low execution time compared to other contemporary state-of-the-art pipelines.
 
+# Usage
+1. Extract local and global features 
+you can follow research/delf/INSTALL_INSTRUCTIONS.md to properly install the DELF library.
+cd research
+export PYTHONPATH=$PYTHONPATH:`pwd`
+cd research/delf/delf/python/example   
+python extract_features.py --list_images_path path_to_image_list_txt --output_dir path_to_middata
+
+2. LCD
+#from  loop-closure-detection/
+mkdir build 
+cmake ..
+make -j 
+./lcd 

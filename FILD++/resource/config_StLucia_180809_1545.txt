@@ -1,0 +1,10 @@
+root_dir			:   /export/sdb/anshan/TRO_LCD/loop-closure-detection/	
+image_dir			:	resource/StLucia_180809_1545/
+image_name_list		:   resource/StLucia_180809_1545_image_list.txt
+frame_rate			: 	3	
+avoid_search_time	:	40
+cnn_feat_dim        :	1024
+top_n				:	5
+hnsw_m              :   48
+hnsw_ef             :   20
+similarity_threshold:   0.1
