@@ -13,15 +13,24 @@ Exhaustive experiments on several publicly-available datasets exhibit the system
 
 # Usage
 1. Extract local and global features 
+
 you can follow research/delf/INSTALL_INSTRUCTIONS.md to properly install the DELF library.
+
 cd research
+
 export PYTHONPATH=$PYTHONPATH:`pwd`
+
 cd research/delf/delf/python/example   
+
 python extract_features.py --list_images_path path_to_image_list_txt --output_dir path_to_middata
 
 2. LCD
 #from  loop-closure-detection/
+
 mkdir build 
+
 cmake ..
+
 make -j 
+
 ./lcd 
