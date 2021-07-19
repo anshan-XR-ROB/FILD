@@ -1,7 +1,7 @@
 # Fast and Incremental Loop Closure Detection with Deep Features and Proximity Graphs
 
 This is the C++ implementation of our new article:
-Shan An, Haogang Zhu, Dong Wei, and Konstantinos A. Tsintotas. Fast and Incremental Loop Closure Detection with Deep Features and Proximity Graphs. Submitted to Transactions on Robotics.
+Shan An, Haogang Zhu, Dong Wei, and Konstantinos A. Tsintotas. Fast and Incremental Loop Closure Detection with Deep Features and Proximity Graphs. Submitted to Journal of Field Robotics.
 
 **Abstract:** 
 In recent years, methods concerning the place recognition task have been extensively examined from the robotics community within the scope of simultaneous localization and mapping applications.
